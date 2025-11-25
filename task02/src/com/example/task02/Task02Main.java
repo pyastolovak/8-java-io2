@@ -3,6 +3,9 @@ package com.example.task02;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.nio.file.Files;
 
 public class Task02Main {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -16,8 +19,10 @@ public class Task02Main {
     }
 
     public static List<Path> listFiles(Path rootDir) throws IOException, InterruptedException {
-        // your implementation here
-
-        return null;
+        try (Stream<Path> s = Files.walk(rootDir)) {
+            return s.filter(Files::isRegularFile)
+                    .sorted()
+                    .collect(Collectors.toList());
+        }
     }
 }

@@ -14,7 +14,22 @@ public class Task01Main {
     }
 
     public static String extractSoundName(File file) throws IOException, InterruptedException {
-        // your implementation here
-        return "sound name";
+        Process p = new ProcessBuilder(
+                "ffprobe", "-v", "error",
+                "-show_entries", "format_tags=title",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                file.getAbsolutePath()
+        ).redirectErrorStream(true).start();
+
+        String title;
+        try (java.io.InputStream in = p.getInputStream();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            byte[] buf = new byte[4096];
+            int n;
+            while ((n = in.read(buf)) != -1) baos.write(buf, 0, n);
+            title = baos.toString(java.nio.charset.StandardCharsets.UTF_8.name()).trim();
+        }
+        p.waitFor();
+        return title.isEmpty() ? null : title;
     }
 }
